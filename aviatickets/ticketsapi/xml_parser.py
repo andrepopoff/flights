@@ -8,7 +8,8 @@ def get_xml_data(file_name):
 
 
 def from_xml_to_dict(xml_data):
-    pass
+    soup = BeautifulSoup(xml_data, features='xml')
+    data = {'response': {'flights': {'onward': [], 'return': []}}}
 
 
 def main():
