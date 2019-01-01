@@ -7,9 +7,17 @@ def get_xml_data(file_name):
         return file.read()
 
 
+def get_tickets_type(xml_data):
+    if 'ReturnPricedItinerary' in xml_data:
+        return 1
+    return 0
+
+
 def from_xml_to_dict(xml_data):
     soup = BeautifulSoup(xml_data, features='xml')
     data = {'response': {'flights': {'onward': [], 'return': []}}}
+    data['response']['return-tickets'] = get_tickets_type(xml_data)
+    print(data)
 
 
 def main():
