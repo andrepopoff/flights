@@ -7,7 +7,6 @@ from ticketsapi.xml_parser import main
 
 class FlightsView(APIView):
     def get(self, request):
-        result = main('xml_files/RS_Via-3.xml')
+        result = main('ticketsapi/xml_files/RS_Via-3.xml')
         response = Response(result, status=status.HTTP_200_OK)
         return response
-    
