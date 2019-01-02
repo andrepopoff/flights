@@ -55,6 +55,16 @@ def from_xml_to_dict(xml_data):
             data['response']['flights'][num]['return'] = []
             add_flight_data_to_dict(tag, 'ReturnPricedItinerary', data, num, 'return')
 
+        data['response']['flights'][num]['pricing'] = {'currency': tag.find('Pricing').get('currency')}
+        data['response']['flights'][num]['pricing']['service-charges'] = []
+
+        service_charges = tag.find('Pricing').find_all('ServiceCharges')
+        for i, charge in enumerate(service_charges):
+            data['response']['flights'][num]['pricing']['service-charges'].append({})
+            data['response']['flights'][num]['pricing']['service-charges'][i]['type'] = charge.get('type')
+            data['response']['flights'][num]['pricing']['service-charges'][i]['charge-type'] = charge.get('ChargeType')
+            data['response']['flights'][num]['pricing']['service-charges'][i]['price'] = charge.text
+
     data = json.dumps(data, sort_keys=True, indent=4)
     print(data)
 
