@@ -14,7 +14,20 @@ def get_tickets_type(xml_data):
 
 
 def get_flight_data(flight_tag):
-    pass
+    return {
+        'carrier-id': flight_tag.find('Carrier').get('id'),
+        'carrier-name': flight_tag.find('Carrier').text,
+        'flight-number': flight_tag.find('FlightNumber').text,
+        'source': flight_tag.find('Source').text,
+        'destination': flight_tag.find('Destination').text,
+        'departure-time': flight_tag.find('DepartureTimeStamp').text,
+        'arrival-time': flight_tag.find('ArrivalTimeStamp').text,
+        'class': flight_tag.find('Class').text,
+        'number-of-stops': flight_tag.find('NumberOfStops').text,
+        'fare-basis': flight_tag.find('FareBasis').text.strip(),
+        'warning-text': flight_tag.find('WarningText').text.strip(),
+        'ticket-type': flight_tag.find('TicketType').text
+    }
 
 
 def from_xml_to_dict(xml_data):
