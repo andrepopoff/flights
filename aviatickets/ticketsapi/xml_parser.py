@@ -79,6 +79,7 @@ def main():
     for file in xml_file_paths:
         xml_data = get_xml_data(file)
         data = from_xml_to_dict(xml_data)
+        print(json.dumps(data, sort_keys=True, indent=4))
 
 
 if __name__ == '__main__':
