@@ -74,13 +74,12 @@ def from_xml_to_dict(xml_data):
     return data
 
 
-def main():
-    xml_file_paths = ('xml_files/RS_Via-3.xml', 'xml_files/RS_ViaOW.xml')
-    for file in xml_file_paths:
-        xml_data = get_xml_data(file)
-        data = from_xml_to_dict(xml_data)
-        print(json.dumps(data, sort_keys=True, indent=4))
+def main(xml_file_path):
+    xml_data = get_xml_data(xml_file_path)
+    return from_xml_to_dict(xml_data)
 
 
 if __name__ == '__main__':
-    main()
+    xml_file_paths = ('xml_files/RS_Via-3.xml', 'xml_files/RS_ViaOW.xml')
+    for file in xml_file_paths:
+        print(main(file))
