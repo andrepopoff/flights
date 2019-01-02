@@ -19,6 +19,7 @@ def from_xml_to_dict(xml_data):
     data['response']['return-tickets'] = get_tickets_type(xml_data)
     data['response']['request-time'] = soup.find('AirFareSearchResponse').get('RequestTime')
     data['response']['response-time'] = soup.find('AirFareSearchResponse').get('ResponseTime')
+    data['response']['request-id'] = soup.find('RequestId').text
     print(data)
 
 
