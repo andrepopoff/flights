@@ -35,6 +35,14 @@ def add_flight_data_to_dict(soup_obj, itinerary_type, data, flight_number, key):
     [data['response']['flights'][flight_number][key].append(get_flight_data(flight_tag)) for flight_tag in flight_tags]
 
 
+def add_service_charges(service_charges_tags, data):
+    for i, charge in enumerate(service_charges_tags):
+        data.append({})
+        data[i]['type'] = charge.get('type')
+        data[i]['charge-type'] = charge.get('ChargeType')
+        data[i]['price'] = charge.text
+
+
 def from_xml_to_dict(xml_data):
     soup = BeautifulSoup(xml_data, features='xml')
     data = {'response': {'flights': []}}
@@ -59,11 +67,7 @@ def from_xml_to_dict(xml_data):
         data['response']['flights'][num]['pricing']['service-charges'] = []
 
         service_charges = tag.find('Pricing').find_all('ServiceCharges')
-        for i, charge in enumerate(service_charges):
-            data['response']['flights'][num]['pricing']['service-charges'].append({})
-            data['response']['flights'][num]['pricing']['service-charges'][i]['type'] = charge.get('type')
-            data['response']['flights'][num]['pricing']['service-charges'][i]['charge-type'] = charge.get('ChargeType')
-            data['response']['flights'][num]['pricing']['service-charges'][i]['price'] = charge.text
+        add_service_charges(service_charges, data['response']['flights'][num]['pricing']['service-charges'])
 
     data = json.dumps(data, sort_keys=True, indent=4)
     print(data)
