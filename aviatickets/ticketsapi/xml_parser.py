@@ -71,8 +71,7 @@ def from_xml_to_dict(xml_data):
         service_charges = tag.find('Pricing').find_all('ServiceCharges')
         add_service_charges(service_charges, pricing['service-charges'])
 
-    data = json.dumps(data, sort_keys=True, indent=4)
-    print(data)
+    return data
 
 
 def main():
