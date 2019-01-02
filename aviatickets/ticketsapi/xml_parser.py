@@ -20,6 +20,9 @@ def from_xml_to_dict(xml_data):
     data['response']['request-time'] = soup.find('AirFareSearchResponse').get('RequestTime')
     data['response']['response-time'] = soup.find('AirFareSearchResponse').get('ResponseTime')
     data['response']['request-id'] = soup.find('RequestId').text
+    flights_tags = soup.find('PricedItineraries').children
+    clean_flights_tags = [tag for tag in flights_tags if tag != '\n']
+    print(len(clean_flights_tags))
     print(data)
 
 
