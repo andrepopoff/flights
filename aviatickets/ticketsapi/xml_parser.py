@@ -32,7 +32,7 @@ def get_flight_data(flight_tag):
 
 def from_xml_to_dict(xml_data):
     soup = BeautifulSoup(xml_data, features='xml')
-    data = {'response': {'flights': {'onward': [], 'return': []}}}
+    data = {'response': {'flights': []}}
 
     data['response']['return-tickets'] = get_tickets_type(xml_data)
     data['response']['request-time'] = soup.find('AirFareSearchResponse').get('RequestTime')
@@ -42,17 +42,17 @@ def from_xml_to_dict(xml_data):
     flights_tags = soup.find('PricedItineraries').children
     clean_flights_tags = [tag for tag in flights_tags if tag != '\n']
 
-    for tag in clean_flights_tags:
+    for num, tag in enumerate(clean_flights_tags):
         onward_flight_tags = tag.find('OnwardPricedItinerary').find_all('Flight')
-        [data['response']['flights']['onward'].append(get_flight_data(flight_tag)) for flight_tag in onward_flight_tags]
+        data['response']['flights'].append({'onward': []})
+        [data['response']['flights'][num]['onward'].append(get_flight_data(flight_tag)) for flight_tag in onward_flight_tags]
 
         if data['response']['return-tickets']:
+            data['response']['flights'][num]['return'] = []
             return_flight_tags = tag.find('ReturnPricedItinerary').find_all('Flight')
-            [data['response']['flights']['return'].append(get_flight_data(flight_tag)) for flight_tag in return_flight_tags]
+            [data['response']['flights'][num]['return'].append(get_flight_data(flight_tag)) for flight_tag in return_flight_tags]
 
-    print(len(clean_flights_tags))
-    print(len(data['response']['flights']['onward']))
-    print(len(data['response']['flights']['return']))
+    data = json.dumps(data, sort_keys=True, indent=4)
     print(data)
 
 
