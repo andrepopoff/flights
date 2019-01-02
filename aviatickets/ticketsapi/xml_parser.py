@@ -44,13 +44,15 @@ def from_xml_to_dict(xml_data):
 
     for tag in clean_flights_tags:
         onward_flight_tags = tag.find('OnwardPricedItinerary').find_all('Flight')
+        [data['response']['flights']['onward'].append(get_flight_data(flight_tag)) for flight_tag in onward_flight_tags]
+
         if data['response']['return-tickets']:
             return_flight_tags = tag.find('ReturnPricedItinerary').find_all('Flight')
-
-        for flight_tag in onward_flight_tags:
-            data['response']['flights']['onward'].append(get_flight_data(flight_tag))
+            [data['response']['flights']['return'].append(get_flight_data(flight_tag)) for flight_tag in return_flight_tags]
 
     print(len(clean_flights_tags))
+    print(len(data['response']['flights']['onward']))
+    print(len(data['response']['flights']['return']))
     print(data)
 
 
