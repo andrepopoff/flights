@@ -16,12 +16,21 @@ def get_tickets_type(xml_data):
 def from_xml_to_dict(xml_data):
     soup = BeautifulSoup(xml_data, features='xml')
     data = {'response': {'flights': {'onward': [], 'return': []}}}
+
     data['response']['return-tickets'] = get_tickets_type(xml_data)
     data['response']['request-time'] = soup.find('AirFareSearchResponse').get('RequestTime')
     data['response']['response-time'] = soup.find('AirFareSearchResponse').get('ResponseTime')
     data['response']['request-id'] = soup.find('RequestId').text
+
     flights_tags = soup.find('PricedItineraries').children
     clean_flights_tags = [tag for tag in flights_tags if tag != '\n']
+
+    for tag in clean_flights_tags:
+        onward_flight_tags = tag.find('OnwardPricedItinerary').find_all('Flight')
+        if data['response']['return-tickets']:
+            return_flight_tags = tag.find('ReturnPricedItinerary').find_all('Flight')
+        print(onward_flight_tags)
+
     print(len(clean_flights_tags))
     print(data)
 
