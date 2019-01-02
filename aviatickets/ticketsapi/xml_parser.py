@@ -13,6 +13,10 @@ def get_tickets_type(xml_data):
     return 0
 
 
+def get_flight_data(flight_tag):
+    pass
+
+
 def from_xml_to_dict(xml_data):
     soup = BeautifulSoup(xml_data, features='xml')
     data = {'response': {'flights': {'onward': [], 'return': []}}}
@@ -29,7 +33,9 @@ def from_xml_to_dict(xml_data):
         onward_flight_tags = tag.find('OnwardPricedItinerary').find_all('Flight')
         if data['response']['return-tickets']:
             return_flight_tags = tag.find('ReturnPricedItinerary').find_all('Flight')
-        print(onward_flight_tags)
+
+        for flight_tag in onward_flight_tags:
+            data['response']['flights']['onward'].append(get_flight_data(flight_tag))
 
     print(len(clean_flights_tags))
     print(data)
