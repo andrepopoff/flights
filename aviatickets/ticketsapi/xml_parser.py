@@ -56,12 +56,12 @@ def from_xml_to_dict(xml_data):
     clean_flights_tags = [tag for tag in flights_tags if tag != '\n']
 
     for num, tag in enumerate(clean_flights_tags):
-        flights.append({'onward': []})
-        add_flight_data_to_dict(tag, 'OnwardPricedItinerary', data, num, 'onward')
+        flights.append({'onward_itinerary': []})
+        add_flight_data_to_dict(tag, 'OnwardPricedItinerary', data, num, 'onward_itinerary')
 
         if data['return_tickets']:
-            flights[num]['return'] = []
-            add_flight_data_to_dict(tag, 'ReturnPricedItinerary', data, num, 'return')
+            flights[num]['return_itinerary'] = []
+            add_flight_data_to_dict(tag, 'ReturnPricedItinerary', data, num, 'return_itinerary')
 
         pricing = flights[num]['pricing'] = {'currency': tag.find('Pricing').get('currency')}
         pricing['service_charges'] = []
