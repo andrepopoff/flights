@@ -20,5 +20,5 @@ from ticketsapi.views import FlightsView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('all/', FlightsView.as_view())
+    path('flights.get/', FlightsView.as_view())
 ]
