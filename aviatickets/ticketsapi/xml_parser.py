@@ -45,27 +45,25 @@ def add_service_charges(service_charges_tags, data):
 
 def from_xml_to_dict(xml_data):
     soup = BeautifulSoup(xml_data, features='xml')
-    data = {'response': {'flights': []}}
-    response = data['response']
-
-    response['return_tickets'] = get_tickets_type(xml_data)
-    response['request_time'] = soup.find('AirFareSearchResponse').get('RequestTime')
-    response['response_time'] = soup.find('AirFareSearchResponse').get('ResponseTime')
-    response['request_id'] = soup.find('RequestId').text
+    data = dict()
+    flights = data['flights'] = []
+    data['return_tickets'] = get_tickets_type(xml_data)
+    data['request_time'] = soup.find('AirFareSearchResponse').get('RequestTime')
+    data['response_time'] = soup.find('AirFareSearchResponse').get('ResponseTime')
+    data['request_id'] = soup.find('RequestId').text
 
     flights_tags = soup.find('PricedItineraries').children
     clean_flights_tags = [tag for tag in flights_tags if tag != '\n']
 
     for num, tag in enumerate(clean_flights_tags):
-        response['flights'].append({'onward': []})
-        add_flight_data_to_dict(tag, 'OnwardPricedItinerary', response, num, 'onward')
+        flights.append({'onward': []})
+        add_flight_data_to_dict(tag, 'OnwardPricedItinerary', data, num, 'onward')
 
-        if response['return_tickets']:
-            response['flights'][num]['return'] = []
-            add_flight_data_to_dict(tag, 'ReturnPricedItinerary', response, num, 'return')
+        if data['return_tickets']:
+            flights[num]['return'] = []
+            add_flight_data_to_dict(tag, 'ReturnPricedItinerary', data, num, 'return')
 
-        response['flights'][num]['pricing'] = {'currency': tag.find('Pricing').get('currency')}
-        pricing = response['flights'][num]['pricing']
+        pricing = flights[num]['pricing'] = {'currency': tag.find('Pricing').get('currency')}
         pricing['service_charges'] = []
 
         service_charges = tag.find('Pricing').find_all('ServiceCharges')
