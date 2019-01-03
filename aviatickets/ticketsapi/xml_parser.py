@@ -72,7 +72,7 @@ def from_xml_to_dict(xml_data):
     return data
 
 
-def main(xml_file_path):
+def get_flights(xml_file_path):
     xml_data = get_xml_data(xml_file_path)
     return from_xml_to_dict(xml_data)
 
@@ -80,4 +80,4 @@ def main(xml_file_path):
 if __name__ == '__main__':
     xml_file_paths = ('xml_files/RS_Via-3.xml', 'xml_files/RS_ViaOW.xml')
     for file in xml_file_paths:
-        print(main(file))
+        print(get_flights(file))
