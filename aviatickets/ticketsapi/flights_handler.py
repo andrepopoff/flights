@@ -77,7 +77,7 @@ def get_flights(xml_file_path):
     return from_xml_to_dict(xml_data)
 
 
-def get_at_extreme_prices(flights, func):
+def get_total_amounts(flights):
     total_amounts = []
     for flight in flights['flights']:
         amount = 0
@@ -86,17 +86,17 @@ def get_at_extreme_prices(flights, func):
                 amount += float(charge['price'])
         total_amounts.append(amount)
 
-    flights['flights'] = [flights['flights'][index] for index, amount in enumerate(total_amounts) if amount == func(total_amounts)]
+    return total_amounts
+
+
+def get_by(key, flights, func):
+    handlers = {'duration': get_durations, 'price': get_total_amounts}
+    all_values = handlers[key](flights)
+    flights['flights'] = [flights['flights'][idx] for idx, val in enumerate(all_values) if val == func(all_values)]
     return flights
 
 
-def calculate_flight_duration(flight, key):
-    departure_time = datetime.strptime(flight[key][0]['departure_time'], '%Y-%m-%dT%H%M')
-    arrival_time = datetime.strptime(flight[key][-1]['arrival_time'], '%Y-%m-%dT%H%M')
-    return arrival_time - departure_time
-
-
-def get_by_duration(flights, func):
+def get_durations(flights):
     durations = []
     for flight in flights['flights']:
         duration = calculate_flight_duration(flight, 'onward_itinerary')
@@ -105,8 +105,20 @@ def get_by_duration(flights, func):
             duration = duration + return_duration
         durations.append(duration)
 
-    flights['flights'] = [flights['flights'][index] for index, duration in enumerate(durations) if duration == func(durations)]
-    return flights
+    return durations
+
+
+def calculate_flight_duration(flight, key):
+    departure_time = datetime.strptime(flight[key][0]['departure_time'], '%Y-%m-%dT%H%M')
+    arrival_time = datetime.strptime(flight[key][-1]['arrival_time'], '%Y-%m-%dT%H%M')
+    return arrival_time - departure_time
+
+
+def get_optimal(flights):
+    durations = get_durations(flights)
+    average_time = sum([duration.total_seconds() for duration in durations]) / len(durations)
+    flights['flights'] = [flight for idx, flight in enumerate(flights['flights']) if durations[idx].total_seconds() <= average_time]
+    return get_by('price', flights, min)
 
 
 if __name__ == '__main__':
@@ -114,4 +126,5 @@ if __name__ == '__main__':
     for file in xml_file_paths:
         flights = get_flights(file)
         # print(get_at_extreme_prices(flights, min))
-        print(get_by_duration(flights, min))
+        # print(get_by_duration(flights, min))
+        print(get_optimal(flights))
