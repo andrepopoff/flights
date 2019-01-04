@@ -115,15 +115,10 @@ def calculate_flight_duration(flight, key):
 
 
 def get_optimal(flights):
-    total_amounts = get_total_amounts(flights)
     durations = get_durations(flights)
-
-    average_price = sum(total_amounts) / len(total_amounts)
     average_time = sum([duration.total_seconds() for duration in durations]) / len(durations)
-
-    flights['flights'] = [flight for idx, flight in enumerate(flights['flights'])
-                          if total_amounts[idx] <= average_price and durations[idx].total_seconds() <= average_time]
-    return flights
+    flights['flights'] = [flight for idx, flight in enumerate(flights['flights']) if durations[idx].total_seconds() <= average_time]
+    return get_by('price', flights, min)
 
 
 if __name__ == '__main__':
