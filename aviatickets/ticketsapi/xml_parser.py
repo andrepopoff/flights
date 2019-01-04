@@ -77,7 +77,21 @@ def get_flights(xml_file_path):
     return from_xml_to_dict(xml_data)
 
 
+def get_at_extreme_prices(flights, func):
+    total_amounts = []
+    for flight in flights['flights']:
+        amount = 0
+        for charge in flight['pricing']['service_charges']:
+            if charge['charge_type'] == 'TotalAmount':
+                amount += float(charge['price'])
+        total_amounts.append(amount)
+
+    flights['flights'] = [flights['flights'][index] for index, amount in enumerate(total_amounts) if amount == func(total_amounts)]
+    return flights
+
+
 if __name__ == '__main__':
     xml_file_paths = ('xml_files/RS_Via-3.xml', 'xml_files/RS_ViaOW.xml')
     for file in xml_file_paths:
-        print(get_flights(file))
+        flights = get_flights(file)
+        print(get_at_extreme_prices(flights, min))
