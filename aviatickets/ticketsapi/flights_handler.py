@@ -95,6 +95,18 @@ def get_at_extreme_prices(flights, func):
     return flights
 
 
+def get_durations(flights):
+    durations = []
+    for flight in flights['flights']:
+        duration = calculate_flight_duration(flight, 'onward_itinerary')
+        if flights['return_tickets']:
+            return_duration = calculate_flight_duration(flight, 'return_itinerary')
+            duration = duration + return_duration
+        durations.append(duration)
+
+    return durations
+
+
 def calculate_flight_duration(flight, key):
     departure_time = datetime.strptime(flight[key][0]['departure_time'], '%Y-%m-%dT%H%M')
     arrival_time = datetime.strptime(flight[key][-1]['arrival_time'], '%Y-%m-%dT%H%M')
@@ -102,29 +114,14 @@ def calculate_flight_duration(flight, key):
 
 
 def get_by_duration(flights, func):
-    durations = []
-    for flight in flights['flights']:
-        duration = calculate_flight_duration(flight, 'onward_itinerary')
-        if flights['return_tickets']:
-            return_duration = calculate_flight_duration(flight, 'return_itinerary')
-            duration = duration + return_duration
-        durations.append(duration)
-
+    durations = get_durations(flights)
     flights['flights'] = [flights['flights'][index] for index, duration in enumerate(durations) if duration == func(durations)]
     return flights
 
 
 def get_optimal(flights):
     total_amounts = get_total_amounts(flights)
-
-    durations = []
-    for flight in flights['flights']:
-        duration = calculate_flight_duration(flight, 'onward_itinerary')
-        if flights['return_tickets']:
-            return_duration = calculate_flight_duration(flight, 'return_itinerary')
-            duration = duration + return_duration
-        durations.append(duration)
-
+    durations = get_durations(flights)
     average_price = sum(total_amounts) / len(total_amounts)
     average_time = sum([duration.total_seconds() for duration in durations]) / len(durations)
 
