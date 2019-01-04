@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from django.http import JsonResponse
 
-from ticketsapi.flights_handler import get_flights, get_at_extreme_prices
+from ticketsapi.flights_handler import get_flights, get_at_extreme_prices, get_by_duration
 
 
 class FlightsView(APIView):
@@ -24,6 +24,10 @@ class FlightsView(APIView):
             result = get_at_extreme_prices(result, max)
         elif flight_type == 'cheap':
             result = get_at_extreme_prices(result, min)
+        elif flight_type == 'longest':
+            result = get_by_duration(result, max)
+        elif flight_type == 'fastest':
+            result = get_by_duration(result, min)
         else:
             return JsonResponse({'error': 'Bad Request (400)'}, status=status.HTTP_400_BAD_REQUEST)
 
