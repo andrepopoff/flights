@@ -109,9 +109,35 @@ def get_by_duration(flights, func):
     return flights
 
 
+def get_optimal(flights):
+    total_amounts = []
+    for flight in flights['flights']:
+        amount = 0
+        for charge in flight['pricing']['service_charges']:
+            if charge['charge_type'] == 'TotalAmount':
+                amount += float(charge['price'])
+        total_amounts.append(amount)
+
+    durations = []
+    for flight in flights['flights']:
+        duration = calculate_flight_duration(flight, 'onward_itinerary')
+        if flights['return_tickets']:
+            return_duration = calculate_flight_duration(flight, 'return_itinerary')
+            duration = duration + return_duration
+        durations.append(duration)
+
+    average_price = sum(total_amounts) / len(total_amounts)
+    average_time = sum([duration.total_seconds() for duration in durations]) / len(durations)
+    
+    flights['flights'] = [flight for idx, flight in enumerate(flights['flights'])
+                          if total_amounts[idx] <= average_price and durations[idx].total_seconds() <= average_time]
+    return flights
+
+
 if __name__ == '__main__':
     xml_file_paths = ('xml_files/RS_Via-3.xml', 'xml_files/RS_ViaOW.xml')
     for file in xml_file_paths:
         flights = get_flights(file)
         # print(get_at_extreme_prices(flights, min))
-        print(get_by_duration(flights, min))
+        # print(get_by_duration(flights, min))
+        print(get_optimal(flights))
