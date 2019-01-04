@@ -77,7 +77,7 @@ def get_flights(xml_file_path):
     return from_xml_to_dict(xml_data)
 
 
-def get_at_extreme_prices(flights, func):
+def get_total_amounts(flights):
     total_amounts = []
     for flight in flights['flights']:
         amount = 0
@@ -86,6 +86,11 @@ def get_at_extreme_prices(flights, func):
                 amount += float(charge['price'])
         total_amounts.append(amount)
 
+    return total_amounts
+
+
+def get_at_extreme_prices(flights, func):
+    total_amounts = get_total_amounts(flights)
     flights['flights'] = [flights['flights'][index] for index, amount in enumerate(total_amounts) if amount == func(total_amounts)]
     return flights
 
@@ -110,13 +115,7 @@ def get_by_duration(flights, func):
 
 
 def get_optimal(flights):
-    total_amounts = []
-    for flight in flights['flights']:
-        amount = 0
-        for charge in flight['pricing']['service_charges']:
-            if charge['charge_type'] == 'TotalAmount':
-                amount += float(charge['price'])
-        total_amounts.append(amount)
+    total_amounts = get_total_amounts(flights)
 
     durations = []
     for flight in flights['flights']:
@@ -128,7 +127,7 @@ def get_optimal(flights):
 
     average_price = sum(total_amounts) / len(total_amounts)
     average_time = sum([duration.total_seconds() for duration in durations]) / len(durations)
-    
+
     flights['flights'] = [flight for idx, flight in enumerate(flights['flights'])
                           if total_amounts[idx] <= average_price and durations[idx].total_seconds() <= average_time]
     return flights
