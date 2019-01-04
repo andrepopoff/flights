@@ -89,9 +89,10 @@ def get_total_amounts(flights):
     return total_amounts
 
 
-def get_at_extreme_prices(flights, func):
-    total_amounts = get_total_amounts(flights)
-    flights['flights'] = [flights['flights'][index] for index, amount in enumerate(total_amounts) if amount == func(total_amounts)]
+def get_by(key, flights, func):
+    handlers = {'duration': get_durations, 'price': get_total_amounts}
+    all_values = handlers[key](flights)
+    flights['flights'] = [flights['flights'][idx] for idx, val in enumerate(all_values) if val == func(all_values)]
     return flights
 
 
@@ -113,15 +114,10 @@ def calculate_flight_duration(flight, key):
     return arrival_time - departure_time
 
 
-def get_by_duration(flights, func):
-    durations = get_durations(flights)
-    flights['flights'] = [flights['flights'][index] for index, duration in enumerate(durations) if duration == func(durations)]
-    return flights
-
-
 def get_optimal(flights):
     total_amounts = get_total_amounts(flights)
     durations = get_durations(flights)
+
     average_price = sum(total_amounts) / len(total_amounts)
     average_time = sum([duration.total_seconds() for duration in durations]) / len(durations)
 
