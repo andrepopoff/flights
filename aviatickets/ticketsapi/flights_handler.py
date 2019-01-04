@@ -1,5 +1,5 @@
-import json
 from bs4 import BeautifulSoup
+from datetime import datetime
 
 
 def get_xml_data(file_name):
@@ -90,8 +90,28 @@ def get_at_extreme_prices(flights, func):
     return flights
 
 
+def calculate_flight_duration(flight, key):
+    departure_time = datetime.strptime(flight[key][0]['departure_time'], '%Y-%m-%dT%H%M')
+    arrival_time = datetime.strptime(flight[key][-1]['arrival_time'], '%Y-%m-%dT%H%M')
+    return arrival_time - departure_time
+
+
+def get_by_duration(flights, func):
+    durations = []
+    for flight in flights['flights']:
+        duration = calculate_flight_duration(flight, 'onward_itinerary')
+        if flights['return_tickets']:
+            return_duration = calculate_flight_duration(flight, 'return_itinerary')
+            duration = duration + return_duration
+        durations.append(duration)
+
+    flights['flights'] = [flights['flights'][index] for index, duration in enumerate(durations) if duration == func(durations)]
+    return flights
+
+
 if __name__ == '__main__':
     xml_file_paths = ('xml_files/RS_Via-3.xml', 'xml_files/RS_ViaOW.xml')
     for file in xml_file_paths:
         flights = get_flights(file)
-        print(get_at_extreme_prices(flights, min))
+        # print(get_at_extreme_prices(flights, min))
+        print(get_by_duration(flights, min))
