@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 from datetime import datetime
+from re import findall
 
 
 def get_xml_data(file_name):
@@ -121,10 +122,48 @@ def get_optimal(flights):
     return get_by('price', flights, min)
 
 
+def check_and_set_params(response1, response2, dict_to_set, set_key):
+    if response1 != response2:
+        dict_to_set['first'][set_key] = response1
+        dict_to_set['second'][set_key] = response2
+
+
+def get_service_charges_types(service_charges):
+    return set(data['type'] for data in service_charges)
+
+
+def get_difference(response1, response2):
+    difference = {'first': {}, 'second': {}}
+
+    flights1 = response1['flights'][0]['onward_itinerary']
+    flights2 = response2['flights'][0]['onward_itinerary']
+    check_and_set_params(response1['return_tickets'], response2['return_tickets'], difference, 'return_itinerary')
+    check_and_set_params(flights1[0]['source'], flights2[0]['source'], difference, 'source')
+    check_and_set_params(flights1[-1]['destination'], flights2[-1]['destination'], difference, 'destination')
+
+    departure_data1 = findall(r'(.+)T', flights1[0]['departure_time'])[0]
+    departure_data2 = findall(r'(.+)T', flights2[0]['departure_time'])[0]
+    check_and_set_params(departure_data1, departure_data2, difference, 'departure_date')
+
+    pricing1 = response1['flights'][0]['pricing']
+    pricing2 = response2['flights'][0]['pricing']
+    check_and_set_params(pricing1['currency'], pricing2['currency'], difference, 'currency')
+
+    type1 = sorted(list(get_service_charges_types(pricing1['service_charges'])))
+    type2 = sorted(list(get_service_charges_types(pricing2['service_charges'])))
+    check_and_set_params(type1, type2, difference, 'type')
+
+    return difference
+
+
 if __name__ == '__main__':
     xml_file_paths = ('xml_files/RS_Via-3.xml', 'xml_files/RS_ViaOW.xml')
+    all_flights = []
     for file in xml_file_paths:
         flights = get_flights(file)
+        all_flights.append(flights)
         # print(get_at_extreme_prices(flights, min))
         # print(get_by_duration(flights, min))
-        print(get_optimal(flights))
+        # print(get_optimal(flights))
+
+    print(get_difference(all_flights[0], all_flights[1]))
