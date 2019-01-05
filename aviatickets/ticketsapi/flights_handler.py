@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 from datetime import datetime
+from re import findall
 
 
 def get_xml_data(file_name):
@@ -133,12 +134,16 @@ def get_service_charges_types(service_charges):
 
 def get_difference(response1, response2):
     difference = {'first': {}, 'second': {}}
+
     flights1 = response1['flights'][0]['onward_itinerary']
     flights2 = response2['flights'][0]['onward_itinerary']
     check_and_set_params(response1['return_tickets'], response2['return_tickets'], difference, 'return_itinerary')
     check_and_set_params(flights1[0]['source'], flights2[0]['source'], difference, 'source')
     check_and_set_params(flights1[-1]['destination'], flights2[-1]['destination'], difference, 'destination')
-    check_and_set_params(flights1[0]['departure_time'], flights2[0]['departure_time'], difference, 'departure_date')
+
+    departure_data1 = findall(r'(.+)T', flights1[0]['departure_time'])[0]
+    departure_data2 = findall(r'(.+)T', flights2[0]['departure_time'])[0]
+    check_and_set_params(departure_data1, departure_data2, difference, 'departure_date')
 
     pricing1 = response1['flights'][0]['pricing']
     pricing2 = response2['flights'][0]['pricing']
