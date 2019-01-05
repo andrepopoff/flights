@@ -121,10 +121,31 @@ def get_optimal(flights):
     return get_by('price', flights, min)
 
 
+def get_difference(response1, response2):
+    difference = {'first': {}, 'second': {}}
+    if response1['return_tickets'] != response2['return_tickets']:
+        difference['first']['return_tickets'] = response1['return_tickets']
+        difference['second']['return_tickets'] = response2['return_tickets']
+
+    if response1['flights'][0]['onward_itinerary'][0]['source'] != response2['flights'][0]['onward_itinerary'][0]['source']:
+        difference['first']['source'] = response1['flights'][0]['onward_itinerary'][0]['source']
+        difference['second']['source'] = response2['flights'][0]['onward_itinerary'][0]['source']
+
+    if response1['flights'][0]['onward_itinerary'][-1]['destination'] != response2['flights'][0]['onward_itinerary'][-1]['destination']:
+        difference['first']['destination'] = response1['flights'][0]['onward_itinerary'][-1]['destination']
+        difference['second']['destination'] = response2['flights'][0]['onward_itinerary'][-1]['destination']
+
+    print(difference)
+
+
 if __name__ == '__main__':
     xml_file_paths = ('xml_files/RS_Via-3.xml', 'xml_files/RS_ViaOW.xml')
+    all_flights = []
     for file in xml_file_paths:
         flights = get_flights(file)
+        all_flights.append(flights)
         # print(get_at_extreme_prices(flights, min))
         # print(get_by_duration(flights, min))
-        print(get_optimal(flights))
+        # print(get_optimal(flights))
+
+    get_difference(all_flights[0], all_flights[1])
