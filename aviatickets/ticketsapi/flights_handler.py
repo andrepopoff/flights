@@ -121,8 +121,15 @@ def get_optimal(flights):
     return get_by('price', flights, min)
 
 
+def check_and_set_params(response1, response2, dict_to_set, key_to_set):
+    if response1 != response2:
+        dict_to_set['first'][key_to_set] = response1
+        dict_to_set['second'][key_to_set] = response2
+
+
 def get_difference(response1, response2):
     difference = {'first': {}, 'second': {}}
+
     if response1['return_tickets'] != response2['return_tickets']:
         difference['first']['return_tickets'] = response1['return_tickets']
         difference['second']['return_tickets'] = response2['return_tickets']
