@@ -121,28 +121,34 @@ def get_optimal(flights):
     return get_by('price', flights, min)
 
 
-def check_and_set_params(response1, response2, dict_to_set, key_to_set):
+def check_and_set_params(response1, response2, dict_to_set, set_key):
     if response1 != response2:
-        dict_to_set['first'][key_to_set] = response1
-        dict_to_set['second'][key_to_set] = response2
+        dict_to_set['first'][set_key] = response1
+        dict_to_set['second'][set_key] = response2
+
+
+def get_service_charges_types(service_charges):
+    return set(data['type'] for data in service_charges)
 
 
 def get_difference(response1, response2):
     difference = {'first': {}, 'second': {}}
+    flights1 = response1['flights'][0]['onward_itinerary']
+    flights2 = response2['flights'][0]['onward_itinerary']
+    check_and_set_params(response1['return_tickets'], response2['return_tickets'], difference, 'return_itinerary')
+    check_and_set_params(flights1[0]['source'], flights2[0]['source'], difference, 'source')
+    check_and_set_params(flights1[-1]['destination'], flights2[-1]['destination'], difference, 'destination')
+    check_and_set_params(flights1[0]['departure_time'], flights2[0]['departure_time'], difference, 'departure_date')
 
-    if response1['return_tickets'] != response2['return_tickets']:
-        difference['first']['return_tickets'] = response1['return_tickets']
-        difference['second']['return_tickets'] = response2['return_tickets']
+    pricing1 = response1['flights'][0]['pricing']
+    pricing2 = response2['flights'][0]['pricing']
+    check_and_set_params(pricing1['currency'], pricing2['currency'], difference, 'currency')
 
-    if response1['flights'][0]['onward_itinerary'][0]['source'] != response2['flights'][0]['onward_itinerary'][0]['source']:
-        difference['first']['source'] = response1['flights'][0]['onward_itinerary'][0]['source']
-        difference['second']['source'] = response2['flights'][0]['onward_itinerary'][0]['source']
-
-    if response1['flights'][0]['onward_itinerary'][-1]['destination'] != response2['flights'][0]['onward_itinerary'][-1]['destination']:
-        difference['first']['destination'] = response1['flights'][0]['onward_itinerary'][-1]['destination']
-        difference['second']['destination'] = response2['flights'][0]['onward_itinerary'][-1]['destination']
-
-    print(difference)
+    type1 = get_service_charges_types(pricing1['service_charges'])
+    type2 = get_service_charges_types(pricing2['service_charges'])
+    check_and_set_params(type1, type2, difference, 'type')
+    
+    return difference
 
 
 if __name__ == '__main__':
@@ -155,4 +161,4 @@ if __name__ == '__main__':
         # print(get_by_duration(flights, min))
         # print(get_optimal(flights))
 
-    get_difference(all_flights[0], all_flights[1])
+    print(get_difference(all_flights[0], all_flights[1]))
