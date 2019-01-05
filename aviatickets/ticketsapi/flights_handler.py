@@ -144,10 +144,10 @@ def get_difference(response1, response2):
     pricing2 = response2['flights'][0]['pricing']
     check_and_set_params(pricing1['currency'], pricing2['currency'], difference, 'currency')
 
-    type1 = get_service_charges_types(pricing1['service_charges'])
-    type2 = get_service_charges_types(pricing2['service_charges'])
+    type1 = sorted(list(get_service_charges_types(pricing1['service_charges'])))
+    type2 = sorted(list(get_service_charges_types(pricing2['service_charges'])))
     check_and_set_params(type1, type2, difference, 'type')
-    
+
     return difference
 
 
