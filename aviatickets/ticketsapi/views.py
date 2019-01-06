@@ -7,9 +7,8 @@ from ticketsapi.flights_handler import get_flights, get_by, get_optimal, get_dif
 
 
 class FlightsView(APIView):
-    def get(self, request):
+    def get(self, request, url):
         return_flights = request.GET.get('return', '1')
-        flight_type = request.GET.get('type', 'all')
 
         if return_flights == '0':
             result = get_flights('ticketsapi/xml_files/RS_ViaOW.xml')
@@ -18,20 +17,18 @@ class FlightsView(APIView):
         else:
             return JsonResponse({'error': 'Bad Request (400)'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if flight_type == 'all':
+        if url == 'getAll':
             pass
-        elif flight_type == 'expensive':
+        elif url == 'getMostExpensive':
             result = get_by('price', result, max)
-        elif flight_type == 'cheap':
+        elif url == 'getCheapest':
             result = get_by('price', result, min)
-        elif flight_type == 'longest':
+        elif url == 'getLongest':
             result = get_by('duration', result, max)
-        elif flight_type == 'fastest':
+        elif url == 'getFastest':
             result = get_by('duration', result, min)
-        elif flight_type == 'optimal':
+        elif url == 'getOptimal':
             result = get_optimal(result)
-        else:
-            return JsonResponse({'error': 'Bad Request (400)'}, status=status.HTTP_400_BAD_REQUEST)
 
         return JsonResponse({'response': result}, status=status.HTTP_200_OK)
 
