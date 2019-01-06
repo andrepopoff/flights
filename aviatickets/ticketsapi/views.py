@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
-# from rest_framework.response import Response
 from rest_framework import status
 from django.http import JsonResponse
 from os.path import join
+# from rest_framework.response import Response
 
 from ticketsapi.flights_handler import get_flights, get_by, get_optimal, get_difference
 
@@ -36,7 +36,7 @@ class FlightsView(APIView):
 
 class DifferenceView(APIView):
     def get(self, request):
-        response1 = get_flights(join('ticketsapi', 'xml_files', 'RS_ViaOW.xml'))
-        response2 = get_flights(join('ticketsapi', 'xml_files', 'RS_Via-3.xml'))
-        result = get_difference(response1, response2)
+        request1 = get_flights(join('ticketsapi', 'xml_files', 'RS_ViaOW.xml'))
+        request2 = get_flights(join('ticketsapi', 'xml_files', 'RS_Via-3.xml'))
+        result = get_difference(request1, request2)
         return JsonResponse({'response': result}, status=status.HTTP_200_OK)
