@@ -18,9 +18,7 @@ class FlightsView(APIView):
         else:
             return JsonResponse({'error': 'Bad Request (400)'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if url == 'getAll':
-            pass
-        elif url == 'getMostExpensive':
+        if url == 'getMostExpensive':
             result = get_by('price', result, max)
         elif url == 'getCheapest':
             result = get_by('price', result, min)
