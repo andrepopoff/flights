@@ -92,6 +92,7 @@ def from_xml_to_dict(xml_data):
     soup = BeautifulSoup(xml_data, features='xml')
     data = dict()
     flights = data['flights'] = []
+
     data['return_tickets'] = get_tickets_type(xml_data)
     data['request_time'] = soup.find('AirFareSearchResponse').get('RequestTime')
     data['response_time'] = soup.find('AirFareSearchResponse').get('ResponseTime')
@@ -239,7 +240,13 @@ def get_service_charges_types(service_charges):
 
 def get_difference(flights_data1, flights_data2):
     """
-    Returns the difference between two flight data dictionaries
+    Returns the difference between two flight data dictionaries.
+
+    Checks only the most important data:
+    - availability of the return itinerary
+    - whether the departure dates match
+    - checks whether the departure and arrival airports match
+    - whether the types of passengers match
 
     :param flights_data1: dictionary with 'flights' key that contain flight data from the first file
     :param flights_data2: dictionary with 'flights' key that contain flight data from the second file
