@@ -109,35 +109,35 @@ def from_xml_to_dict(xml_data):
     """
     try:
         soup = BeautifulSoup(xml_data, features='xml')
-    except TypeError:
-        return
+        data = dict()
 
-    data = dict()
-    flights = data['flights'] = []
+        flights = data['flights'] = []
+        data['return_tickets'] = get_tickets_type(xml_data)
+        data['request_time'] = soup.find('AirFareSearchResponse').get('RequestTime')
+        data['response_time'] = soup.find('AirFareSearchResponse').get('ResponseTime')
+        data['request_id'] = soup.find('RequestId').text
 
-    data['return_tickets'] = get_tickets_type(xml_data)
-    data['request_time'] = soup.find('AirFareSearchResponse').get('RequestTime')
-    data['response_time'] = soup.find('AirFareSearchResponse').get('ResponseTime')
-    data['request_id'] = soup.find('RequestId').text
+        flights_tags = soup.find('PricedItineraries').children
+        clean_flights_tags = [tag for tag in flights_tags if tag != '\n']
 
-    flights_tags = soup.find('PricedItineraries').children
-    clean_flights_tags = [tag for tag in flights_tags if tag != '\n']
+        for num, tag in enumerate(clean_flights_tags):
+            flights.append({'onward_itinerary': []})
+            add_flight_data_to_dict(tag, 'OnwardPricedItinerary', data, num, 'onward_itinerary')
 
-    for num, tag in enumerate(clean_flights_tags):
-        flights.append({'onward_itinerary': []})
-        add_flight_data_to_dict(tag, 'OnwardPricedItinerary', data, num, 'onward_itinerary')
+            if data['return_tickets']:
+                flights[num]['return_itinerary'] = []
+                add_flight_data_to_dict(tag, 'ReturnPricedItinerary', data, num, 'return_itinerary')
 
-        if data['return_tickets']:
-            flights[num]['return_itinerary'] = []
-            add_flight_data_to_dict(tag, 'ReturnPricedItinerary', data, num, 'return_itinerary')
+            pricing = flights[num]['pricing'] = {'currency': tag.find('Pricing').get('currency')}
+            pricing['service_charges'] = []
 
-        pricing = flights[num]['pricing'] = {'currency': tag.find('Pricing').get('currency')}
-        pricing['service_charges'] = []
+            service_charges = tag.find('Pricing').find_all('ServiceCharges')
+            add_service_charges(service_charges, pricing['service_charges'])
 
-        service_charges = tag.find('Pricing').find_all('ServiceCharges')
-        add_service_charges(service_charges, pricing['service_charges'])
+        return data
 
-    return data
+    except (TypeError, AttributeError) as error:
+        print('In func {}: {} {}'.format(from_xml_to_dict.__name__, error.__class__, error))
 
 
 def get_flights(xml_file_path):
@@ -300,6 +300,4 @@ def get_difference(flights_data1, flights_data2):
 if __name__ == '__main__':
     soup = BeautifulSoup('<return><Flight>air</Flight></return>', features='xml')
     data = {'flights': []}
-    l = []
-    print(add_service_charges(soup, l))
-    print(l)
+    print(from_xml_to_dict(''))
