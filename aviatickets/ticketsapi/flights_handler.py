@@ -14,8 +14,11 @@ def get_xml_data(xml_file_path):
     :param xml_file_path: <class 'str'> - XML file path
     :return: <class 'str'> - XML file data
     """
-    with open(xml_file_path, 'r') as file:
-        return file.read()
+    try:
+        with open(xml_file_path, 'r') as file:
+            return file.read()
+    except (FileNotFoundError, OSError, TypeError) as error:
+        print('In func {}: {} {}'.format(get_xml_data.__name__, error.__class__, error))
 
 
 def get_tickets_type(xml_data):
@@ -89,7 +92,11 @@ def from_xml_to_dict(xml_data):
     :param xml_data: string with XML data
     :return: dictionary with flights data
     """
-    soup = BeautifulSoup(xml_data, features='xml')
+    try:
+        soup = BeautifulSoup(xml_data, features='xml')
+    except TypeError:
+        return
+
     data = dict()
     flights = data['flights'] = []
 
@@ -276,14 +283,4 @@ def get_difference(flights_data1, flights_data2):
 
 
 if __name__ == '__main__':
-    xml_file_paths = ('xml_files/RS_Via-3.xml', 'xml_files/RS_ViaOW.xml')
-    all_flights = []
-    for path in xml_file_paths:
-        flights = get_flights(path)
-        all_flights.append(flights)
-        # print(get_at_extreme_prices(flights, min))
-        # print(get_by_duration(flights, min))
-        # print(get_optimal(flights))
-
-    print(get_difference(all_flights[0], all_flights[1]))
-    print(get_optimal.__doc__)
+    print(get_xml_data(20))
