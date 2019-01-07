@@ -280,7 +280,10 @@ def get_service_charges_types(service_charges):
     :param service_charges: list with dictionaries as objects that contain service charge data
     :return: <class 'set'> with service charge types for flight
     """
-    return set(data['type'] for data in service_charges)
+    try:
+        return set(data['type'] for data in service_charges)
+    except (KeyError, TypeError) as error:
+        print('In func {}: {} {}'.format(get_service_charges_types.__name__, error.__class__, error))
 
 
 def get_difference(flights_data1, flights_data2):
