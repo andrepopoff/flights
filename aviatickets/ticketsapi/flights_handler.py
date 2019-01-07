@@ -245,12 +245,15 @@ def get_optimal(flights):
     :param flights: dictionary with 'flights' key that contain flight data
     :return: dictionary with optimal flights
     """
-    durations = get_durations(flights)
-    average_time = sum([duration.total_seconds() for duration in durations]) / len(durations)
-    flights['flights'] = [
-        flight for idx, flight in enumerate(flights['flights']) if durations[idx].total_seconds() <= average_time
-    ]
-    return get_by('price', flights, min)
+    try:
+        durations = get_durations(flights)
+        average_time = sum([duration.total_seconds() for duration in durations]) / len(durations)
+        flights['flights'] = [
+            flight for idx, flight in enumerate(flights['flights']) if durations[idx].total_seconds() <= average_time
+        ]
+        return get_by('price', flights, min)
+    except (KeyError, TypeError) as error:
+        print('In func {}: {} {}'.format(get_optimal.__name__, error.__class__, error))
 
 
 def check_and_set_params(source1, source2, dict_to_set, set_key):
@@ -317,4 +320,4 @@ def get_difference(flights_data1, flights_data2):
 if __name__ == '__main__':
     soup = BeautifulSoup('<return><Flight>air</Flight></return>', features='xml')
     data = {'flights': []}
-    print(get_by('duration', data, max))
+    print(get_optimal(10))
