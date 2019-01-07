@@ -7,6 +7,19 @@ from datetime import datetime
 from re import findall
 
 
+def exc_handler(func):
+    """
+    Decorator function that handles exceptions
+    """
+    def wrapped(*args, **kwargs):
+        try:
+            func(*args, **kwargs)
+        except (FileNotFoundError, OSError, TypeError, AttributeError, KeyError, IndexError, Exception, ValueError) as e:
+            print('In func {}: {} {}'.format(func.__name__, e.__class__, e))
+    return wrapped
+
+
+@exc_handler
 def get_xml_data(xml_file_path):
     """
     Reads xml file
@@ -14,11 +27,8 @@ def get_xml_data(xml_file_path):
     :param xml_file_path: <class 'str'> - XML file path
     :return: <class 'str'> - XML file data
     """
-    try:
-        with open(xml_file_path, 'r') as file:
-            return file.read()
-    except (FileNotFoundError, OSError, TypeError) as error:
-        print('In func {}: {} {}'.format(get_xml_data.__name__, error.__class__, error))
+    with open(xml_file_path, 'r') as file:
+        return file.read()
 
 
 def get_tickets_type(xml_data):
@@ -326,5 +336,4 @@ def get_difference(flights_data1, flights_data2):
 if __name__ == '__main__':
     soup = BeautifulSoup('<return><Flight>air</Flight></return>', features='xml')
     data = {'flights': []}
-    print(check_and_set_params(10, 1, [], 0))
-    print(data)
+    print(get_xml_data([]))
