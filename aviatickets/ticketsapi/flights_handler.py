@@ -72,8 +72,11 @@ def add_flight_data_to_dict(soup_obj, itinerary_type, data, flight_number, set_k
     :param flight_number: <class 'int'> - flight order in data['flights'] list
     :param set_key: <class 'str'> - key to set data['flights'][flight_number][set_key]
     """
-    flight_tags = soup_obj.find(itinerary_type).find_all('Flight')
-    [data['flights'][flight_number][set_key].append(get_flight_data(flight_tag)) for flight_tag in flight_tags]
+    try:
+        flight_tags = soup_obj.find(itinerary_type).find_all('Flight')
+        [data['flights'][flight_number][set_key].append(get_flight_data(flight_tag)) for flight_tag in flight_tags]
+    except (AttributeError, KeyError, TypeError, IndexError) as error:
+        print('In func {}: {} {}'.format(add_flight_data_to_dict.__name__, error.__class__, error))
 
 
 def add_service_charges(service_charges_tags, data):
@@ -288,8 +291,6 @@ def get_difference(flights_data1, flights_data2):
 
 
 if __name__ == '__main__':
-    soup = BeautifulSoup('', 'lxml')
-    soup2 = BeautifulSoup('', features='xml')
-    print(get_flight_data(soup))
-    print(type(soup))
-    print(type(soup2))
+    soup = BeautifulSoup('<return><Flight>air</Flight></return>', features='xml')
+    data = {'flights': []}
+    print(add_flight_data_to_dict(soup, 'return', data, 1, 0))
