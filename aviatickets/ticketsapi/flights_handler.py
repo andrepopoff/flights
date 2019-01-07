@@ -265,9 +265,12 @@ def check_and_set_params(source1, source2, dict_to_set, set_key):
     :param dict_to_set: dictionary to set data
     :param set_key: dictionary key
     """
-    if source1 != source2:
-        dict_to_set['first'][set_key] = source1
-        dict_to_set['second'][set_key] = source2
+    try:
+        if source1 != source2:
+            dict_to_set['first'][str(set_key)] = source1
+            dict_to_set['second'][str(set_key)] = source2
+    except (KeyError, TypeError) as error:
+        print('In func {}: {} {}'.format(check_and_set_params.__name__, error.__class__, error))
 
 
 def get_service_charges_types(service_charges):
@@ -320,4 +323,5 @@ def get_difference(flights_data1, flights_data2):
 if __name__ == '__main__':
     soup = BeautifulSoup('<return><Flight>air</Flight></return>', features='xml')
     data = {'flights': []}
-    print(get_optimal(10))
+    print(check_and_set_params(10, 1, [], 0))
+    print(data)
