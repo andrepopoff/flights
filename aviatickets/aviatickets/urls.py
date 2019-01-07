@@ -17,16 +17,16 @@ Including another URLconf
 from django.urls import path
 from django.conf.urls import url
 
-from ticketsapi.views import FlightsView, DifferenceView
+from ticketsapi.views import flights_view, flights_difference_view
 
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
-    url('flights.(getAll)', FlightsView.as_view()),
-    url('flights.(getMostExpensive)', FlightsView.as_view()),
-    url('flights.(getCheapest)', FlightsView.as_view()),
-    url('flights.(getLongest)', FlightsView.as_view()),
-    url('flights.(getFastest)', FlightsView.as_view()),
-    url('flights.(getOptimal)', FlightsView.as_view()),
-    path('flights.getDifference', DifferenceView.as_view())
+    url('flights.(getAll)', flights_view),
+    url('flights.(getMostExpensive)', flights_view),
+    url('flights.(getCheapest)', flights_view),
+    url('flights.(getLongest)', flights_view),
+    url('flights.(getFastest)', flights_view),
+    url('flights.(getOptimal)', flights_view),
+    path('flights.getDifference', flights_difference_view)
 ]
