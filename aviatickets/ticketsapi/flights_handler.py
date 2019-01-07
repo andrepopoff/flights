@@ -43,20 +43,23 @@ def get_flight_data(flight_tag):
     :param flight_tag: <class 'bs4.element.Tag'>
     :return: dictionary with flight data
     """
-    return {
-        'carrier_id': flight_tag.find('Carrier').get('id'),
-        'carrier_name': flight_tag.find('Carrier').text,
-        'flight_number': flight_tag.find('FlightNumber').text,
-        'source': flight_tag.find('Source').text,
-        'destination': flight_tag.find('Destination').text,
-        'departure_time': flight_tag.find('DepartureTimeStamp').text,
-        'arrival_time': flight_tag.find('ArrivalTimeStamp').text,
-        'class': flight_tag.find('Class').text,
-        'number_of_stops': flight_tag.find('NumberOfStops').text,
-        'fare_basis': flight_tag.find('FareBasis').text.strip(),
-        'warning_text': flight_tag.find('WarningText').text.strip(),
-        'ticket_type': flight_tag.find('TicketType').text
-    }
+    try:
+        return {
+            'carrier_id': flight_tag.find('Carrier').get('id'),
+            'carrier_name': flight_tag.find('Carrier').text,
+            'flight_number': flight_tag.find('FlightNumber').text,
+            'source': flight_tag.find('Source').text,
+            'destination': flight_tag.find('Destination').text,
+            'departure_time': flight_tag.find('DepartureTimeStamp').text,
+            'arrival_time': flight_tag.find('ArrivalTimeStamp').text,
+            'class': flight_tag.find('Class').text,
+            'number_of_stops': flight_tag.find('NumberOfStops').text,
+            'fare_basis': flight_tag.find('FareBasis').text.strip(),
+            'warning_text': flight_tag.find('WarningText').text.strip(),
+            'ticket_type': flight_tag.find('TicketType').text
+        }
+    except AttributeError as error:
+        print('In func {}: {} {}'.format(get_flight_data.__name__, error.__class__, error))
 
 
 def add_flight_data_to_dict(soup_obj, itinerary_type, data, flight_number, set_key):
@@ -285,4 +288,8 @@ def get_difference(flights_data1, flights_data2):
 
 
 if __name__ == '__main__':
-    print(get_tickets_type(BeautifulSoup('ss', 'lxml')))
+    soup = BeautifulSoup('', 'lxml')
+    soup2 = BeautifulSoup('', features='xml')
+    print(get_flight_data(soup))
+    print(type(soup))
+    print(type(soup2))
