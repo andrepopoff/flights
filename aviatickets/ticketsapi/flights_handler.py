@@ -13,7 +13,7 @@ def exc_handler(func):
     """
     def wrapped(*args, **kwargs):
         try:
-            func(*args, **kwargs)
+            return func(*args, **kwargs)
         except (FileNotFoundError, OSError, TypeError, AttributeError, KeyError, IndexError, Exception, ValueError) as e:
             print('In func {}: {} {}'.format(func.__name__, e.__class__, e))
     return wrapped
