@@ -195,15 +195,19 @@ def get_durations(flights):
     :param flights: dictionary with 'flights' key that contain flight data
     :return: durations list that contain durations for all flights
     """
-    durations = []
-    for flight in flights['flights']:
-        duration = calculate_flight_duration(flight['onward_itinerary'])
-        if flights['return_tickets']:
-            return_duration = calculate_flight_duration(flight['return_itinerary'])
-            duration = duration + return_duration
-        durations.append(duration)
+    try:
+        durations = []
+        for flight in flights['flights']:
+            duration = calculate_flight_duration(flight['onward_itinerary'])
+            if flights['return_tickets']:
+                return_duration = calculate_flight_duration(flight['return_itinerary'])
+                duration = duration + return_duration
+            durations.append(duration)
 
-    return durations
+        return durations
+
+    except (TypeError, KeyError) as error:
+        print('In func {}: {} {}'.format(get_durations.__name__, error.__class__, error))
 
 
 def get_by(key, flights, func):
