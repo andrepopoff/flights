@@ -223,10 +223,16 @@ def get_by(key, flights, func):
     If you need to find the longest or most expensive --> max
     :return: dictionary with flights data
     """
-    handlers = {'duration': get_durations, 'price': get_total_amounts}
-    all_values = handlers[key](flights)
-    flights['flights'] = [flights['flights'][idx] for idx, val in enumerate(all_values) if val == func(all_values)]
-    return flights
+    try:
+        if func not in (max, min):
+            raise TypeError('Parameter func must be only min or max builtin func')
+
+        handlers = {'duration': get_durations, 'price': get_total_amounts}
+        all_values = handlers[key](flights)
+        flights['flights'] = [flights['flights'][idx] for idx, val in enumerate(all_values) if val == func(all_values)]
+        return flights
+    except (KeyError, TypeError) as error:
+        print('In func {}: {} {}'.format(get_by.__name__, error.__class__, error))
 
 
 def get_optimal(flights):
@@ -311,4 +317,4 @@ def get_difference(flights_data1, flights_data2):
 if __name__ == '__main__':
     soup = BeautifulSoup('<return><Flight>air</Flight></return>', features='xml')
     data = {'flights': []}
-    print(calculate_flight_duration(data))
+    print(get_by('duration', data, max))
