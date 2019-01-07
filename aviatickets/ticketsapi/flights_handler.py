@@ -86,11 +86,18 @@ def add_service_charges(service_charges_tags, data):
     :param service_charges_tags: <class 'bs4.element.ResultSet'>
     :param data: list to add service charges data
     """
-    for i, charge in enumerate(service_charges_tags):
-        data.append({})
-        data[i]['type'] = charge.get('type')
-        data[i]['charge_type'] = charge.get('ChargeType')
-        data[i]['price'] = charge.text
+    try:
+        for i, charge in enumerate(service_charges_tags):
+            data.append({})
+            type_ = data[i]['type'] = charge.get('type')
+            charge_type = data[i]['charge_type'] = charge.get('ChargeType')
+            price = data[i]['price'] = charge.text
+
+            if not type_ or not charge_type or not price:
+                raise Exception('One of the parameters was not found. Wrong data in service_charges_tags')
+
+    except (AttributeError, Exception) as error:
+        print('In func {}: {} {}'.format(add_service_charges.__name__, error.__class__, error))
 
 
 def from_xml_to_dict(xml_data):
@@ -293,4 +300,6 @@ def get_difference(flights_data1, flights_data2):
 if __name__ == '__main__':
     soup = BeautifulSoup('<return><Flight>air</Flight></return>', features='xml')
     data = {'flights': []}
-    print(add_flight_data_to_dict(soup, 'return', data, 1, 0))
+    l = []
+    print(add_service_charges(soup, l))
+    print(l)
