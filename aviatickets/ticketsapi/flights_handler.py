@@ -158,15 +158,19 @@ def get_total_amounts(flights):
     :param flights: dictionary with 'flights' key that contain flight data
     :return: total amounts list that contain total amounts for all flights
     """
-    total_amounts = []
-    for flight in flights['flights']:
-        amount = 0
-        for charge in flight['pricing']['service_charges']:
-            if charge['charge_type'] == 'TotalAmount':
-                amount += float(charge['price'])
-        total_amounts.append(amount)
+    try:
+        total_amounts = []
+        for flight in flights['flights']:
+            amount = 0
+            for charge in flight['pricing']['service_charges']:
+                if charge['charge_type'] == 'TotalAmount':
+                    amount += float(charge['price'])
+            total_amounts.append(amount)
 
-    return total_amounts
+        return total_amounts
+
+    except (TypeError, KeyError, ValueError) as error:
+        print('In func {}: {} {}'.format(get_total_amounts.__name__, error.__class__, error))
 
 
 def calculate_flight_duration(flight_data):
@@ -300,4 +304,4 @@ def get_difference(flights_data1, flights_data2):
 if __name__ == '__main__':
     soup = BeautifulSoup('<return><Flight>air</Flight></return>', features='xml')
     data = {'flights': []}
-    print(from_xml_to_dict(''))
+    print(get_total_amounts(data))
