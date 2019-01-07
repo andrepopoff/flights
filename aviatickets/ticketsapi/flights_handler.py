@@ -7,6 +7,19 @@ from datetime import datetime
 from re import findall
 
 
+def exc_handler(func):
+    """
+    Decorator function that handles exceptions
+    """
+    def wrapped(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except (FileNotFoundError, OSError, TypeError, AttributeError, KeyError, IndexError, Exception, ValueError) as e:
+            print('In func {}: {} {}'.format(func.__name__, e.__class__, e))
+    return wrapped
+
+
+@exc_handler
 def get_xml_data(xml_file_path):
     """
     Reads xml file
@@ -26,11 +39,14 @@ def get_tickets_type(xml_data):
     :return: <class 'int'> - returns 1 if there are return itineraries.
     If not, it returns 0
     """
-    if 'ReturnPricedItinerary' in xml_data:
-        return 1
-    return 0
+    try:
+        return 1 if 'ReturnPricedItinerary' in xml_data else 0
+    except TypeError as error:
+        print('In func {}: {} {}'.format(get_tickets_type.__name__, error.__class__, error))
+        return 0
 
 
+@exc_handler
 def get_flight_data(flight_tag):
     """
     Parsing flight data from xml tags
@@ -54,6 +70,7 @@ def get_flight_data(flight_tag):
     }
 
 
+@exc_handler
 def add_flight_data_to_dict(soup_obj, itinerary_type, data, flight_number, set_key):
     """
     Adds flight data to the dictionary
@@ -68,6 +85,7 @@ def add_flight_data_to_dict(soup_obj, itinerary_type, data, flight_number, set_k
     [data['flights'][flight_number][set_key].append(get_flight_data(flight_tag)) for flight_tag in flight_tags]
 
 
+@exc_handler
 def add_service_charges(service_charges_tags, data):
     """
     Adds service charges data to the dictionary
@@ -77,11 +95,15 @@ def add_service_charges(service_charges_tags, data):
     """
     for i, charge in enumerate(service_charges_tags):
         data.append({})
-        data[i]['type'] = charge.get('type')
-        data[i]['charge_type'] = charge.get('ChargeType')
-        data[i]['price'] = charge.text
+        type_ = data[i]['type'] = charge.get('type')
+        charge_type = data[i]['charge_type'] = charge.get('ChargeType')
+        price = data[i]['price'] = charge.text
+
+        if not type_ or not charge_type or not price:
+            raise Exception('One of the parameters was not found. Wrong data in service_charges_tags')
 
 
+@exc_handler
 def from_xml_to_dict(xml_data):
     """
     From XML data to the dictionary
@@ -91,8 +113,8 @@ def from_xml_to_dict(xml_data):
     """
     soup = BeautifulSoup(xml_data, features='xml')
     data = dict()
-    flights = data['flights'] = []
 
+    flights = data['flights'] = []
     data['return_tickets'] = get_tickets_type(xml_data)
     data['request_time'] = soup.find('AirFareSearchResponse').get('RequestTime')
     data['response_time'] = soup.find('AirFareSearchResponse').get('ResponseTime')
@@ -129,6 +151,7 @@ def get_flights(xml_file_path):
     return from_xml_to_dict(xml_data)
 
 
+@exc_handler
 def get_total_amounts(flights):
     """
     Calculates the total amount of each flight
@@ -147,6 +170,7 @@ def get_total_amounts(flights):
     return total_amounts
 
 
+@exc_handler
 def calculate_flight_duration(flight_data):
     """
     Calculates the flight duration
@@ -159,6 +183,7 @@ def calculate_flight_duration(flight_data):
     return arrival_time - departure_time
 
 
+@exc_handler
 def get_durations(flights):
     """
     Calculates the duration of each flight
@@ -177,6 +202,7 @@ def get_durations(flights):
     return durations
 
 
+@exc_handler
 def get_by(key, flights, func):
     """
     Returns the most expensive/cheapest, longest/fastest flights
@@ -190,12 +216,16 @@ def get_by(key, flights, func):
     If you need to find the longest or most expensive --> max
     :return: dictionary with flights data
     """
+    if func not in (max, min):
+        raise TypeError('Parameter func must be only min or max builtin func')
+
     handlers = {'duration': get_durations, 'price': get_total_amounts}
     all_values = handlers[key](flights)
     flights['flights'] = [flights['flights'][idx] for idx, val in enumerate(all_values) if val == func(all_values)]
     return flights
 
 
+@exc_handler
 def get_optimal(flights):
     """
     Finds the best flight option.
@@ -214,6 +244,7 @@ def get_optimal(flights):
     return get_by('price', flights, min)
 
 
+@exc_handler
 def check_and_set_params(source1, source2, dict_to_set, set_key):
     """
     Checks the equality of source1 and source2 and adds a key and value to the dictionary
@@ -224,10 +255,11 @@ def check_and_set_params(source1, source2, dict_to_set, set_key):
     :param set_key: dictionary key
     """
     if source1 != source2:
-        dict_to_set['first'][set_key] = source1
-        dict_to_set['second'][set_key] = source2
+        dict_to_set['first'][str(set_key)] = source1
+        dict_to_set['second'][str(set_key)] = source2
 
 
+@exc_handler
 def get_service_charges_types(service_charges):
     """
     Returns service charge types
@@ -238,6 +270,7 @@ def get_service_charges_types(service_charges):
     return set(data['type'] for data in service_charges)
 
 
+@exc_handler
 def get_difference(flights_data1, flights_data2):
     """
     Returns the difference between two flight data dictionaries.
@@ -276,14 +309,6 @@ def get_difference(flights_data1, flights_data2):
 
 
 if __name__ == '__main__':
-    xml_file_paths = ('xml_files/RS_Via-3.xml', 'xml_files/RS_ViaOW.xml')
-    all_flights = []
-    for path in xml_file_paths:
-        flights = get_flights(path)
-        all_flights.append(flights)
-        # print(get_at_extreme_prices(flights, min))
-        # print(get_by_duration(flights, min))
-        # print(get_optimal(flights))
-
-    print(get_difference(all_flights[0], all_flights[1]))
-    print(get_optimal.__doc__)
+    soup = BeautifulSoup('<return><Flight>air</Flight></return>', features='xml')
+    data = {'flights': []}
+    print(add_service_charges(soup, []))
