@@ -180,9 +180,12 @@ def calculate_flight_duration(flight_data):
     :param flight_data: dictionary that contain flight data
     :return: <class 'datetime.timedelta'>
     """
-    departure_time = datetime.strptime(flight_data[0]['departure_time'], '%Y-%m-%dT%H%M')
-    arrival_time = datetime.strptime(flight_data[-1]['arrival_time'], '%Y-%m-%dT%H%M')
-    return arrival_time - departure_time
+    try:
+        departure_time = datetime.strptime(flight_data[0]['departure_time'], '%Y-%m-%dT%H%M')
+        arrival_time = datetime.strptime(flight_data[-1]['arrival_time'], '%Y-%m-%dT%H%M')
+        return arrival_time - departure_time
+    except (KeyError, IndexError, TypeError, ValueError) as error:
+        print('In func {}: {} {}'.format(calculate_flight_duration.__name__, error.__class__, error))
 
 
 def get_durations(flights):
@@ -304,4 +307,4 @@ def get_difference(flights_data1, flights_data2):
 if __name__ == '__main__':
     soup = BeautifulSoup('<return><Flight>air</Flight></return>', features='xml')
     data = {'flights': []}
-    print(get_total_amounts(data))
+    print(calculate_flight_duration(data))
