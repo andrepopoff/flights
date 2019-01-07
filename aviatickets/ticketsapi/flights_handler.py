@@ -29,9 +29,11 @@ def get_tickets_type(xml_data):
     :return: <class 'int'> - returns 1 if there are return itineraries.
     If not, it returns 0
     """
-    if 'ReturnPricedItinerary' in xml_data:
-        return 1
-    return 0
+    try:
+        return 1 if 'ReturnPricedItinerary' in xml_data else 0
+    except TypeError as error:
+        print('In func {}: {} {}'.format(get_tickets_type.__name__, error.__class__, error))
+        return 0
 
 
 def get_flight_data(flight_tag):
@@ -283,4 +285,4 @@ def get_difference(flights_data1, flights_data2):
 
 
 if __name__ == '__main__':
-    print(get_xml_data(20))
+    print(get_tickets_type(BeautifulSoup('ss', 'lxml')))
