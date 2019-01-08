@@ -82,7 +82,7 @@ def from_xml_to_dict(xml_file_path):
     """
     From XML data to the dictionary
 
-    :param xml_file_path: string with XML data
+    :param xml_file_path: string with path to XML file
     :return: dictionary with flights data
     """
     doc = etree.parse(xml_file_path)
