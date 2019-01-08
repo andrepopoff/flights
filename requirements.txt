@@ -1,6 +1,4 @@
-beautifulsoup4==4.7.0
 Django==2.1.5
 djangorestframework==3.9.0
 lxml==4.3.0
 pytz==2018.7
-soupsieve==1.6.2
