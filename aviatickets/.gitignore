@@ -4,7 +4,7 @@ db.sqlite3
 *.pid
 media/
 static/
-__ pycache __
+__pycache__
 .DS_Store
 **/migrations/**
 !**/migrations
