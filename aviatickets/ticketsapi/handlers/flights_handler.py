@@ -9,18 +9,6 @@ from ticketsapi.handlers.exc_handler import exc_handler
 from ticketsapi.handlers.flights_parser import from_xml_to_dict
 
 
-@exc_handler
-def get_xml_data(xml_file_path):
-    """
-    Reads xml file
-
-    :param xml_file_path: <class 'str'> - XML file path
-    :return: <class 'str'> - XML file data
-    """
-    with open(xml_file_path, 'r') as file:
-        return file.read()
-
-
 def get_flights(xml_file_path):
     """
     Receives flight data
@@ -28,8 +16,8 @@ def get_flights(xml_file_path):
     :param xml_file_path: path where the XML file is located
     :return: dictionary with flights data
     """
-    xml_data = get_xml_data(xml_file_path)
-    return from_xml_to_dict(xml_data)
+    # xml_data = get_xml_data(xml_file_path)
+    return from_xml_to_dict(xml_file_path)
 
 
 @exc_handler
