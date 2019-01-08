@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from os.path import join
 # from rest_framework.response import Response
 
-from ticketsapi.flights_handler import get_flights, get_by, get_optimal, get_difference
+from ticketsapi.handlers.flights_handler import get_flights, get_by, get_optimal, get_difference
 
 
 @api_view(['GET'])
