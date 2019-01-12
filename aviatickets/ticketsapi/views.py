@@ -5,6 +5,8 @@ from os.path import join
 # from rest_framework.response import Response
 
 from ticketsapi.handlers.flights_handler import get_flights, get_by, get_optimal, get_difference
+from ticketsapi.models import Method
+from ticketsapi.serializers import MethodSerializer
 
 
 @api_view(['GET'])
@@ -39,3 +41,9 @@ def flights_difference_view(request):
     result = get_difference(request1, request2)
     return JsonResponse({'response': result}, status=status.HTTP_200_OK)
 
+
+def methods_list(request):
+    if request.method == 'GET':
+        methods = Method.objects.all()
+        serializer = MethodSerializer(methods, many=True)
+        return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
