@@ -17,11 +17,12 @@ Including another URLconf
 from django.urls import path
 from django.conf.urls import url
 
-from ticketsapi.views import flights_view, flights_difference_view
+from ticketsapi.views import flights_view, flights_difference_view, methods_list
 
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
+    url('^$', methods_list),
     url('flights.(getAll)', flights_view),
     url('flights.(getMostExpensive)', flights_view),
     url('flights.(getCheapest)', flights_view),

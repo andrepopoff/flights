@@ -2,9 +2,12 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from django.http import JsonResponse
 from os.path import join
-# from rest_framework.response import Response
+from rest_framework.response import Response
+from rest_framework.parsers import JSONParser
 
 from ticketsapi.handlers.flights_handler import get_flights, get_by, get_optimal, get_difference
+from ticketsapi.models import Method
+from ticketsapi.serializers import MethodSerializer
 
 
 @api_view(['GET'])
@@ -39,3 +42,18 @@ def flights_difference_view(request):
     result = get_difference(request1, request2)
     return JsonResponse({'response': result}, status=status.HTTP_200_OK)
 
+
+@api_view(['GET', 'POST'])
+def methods_list(request):
+    if request.method == 'GET':
+        methods = Method.objects.all()
+        serializer = MethodSerializer(methods, many=True)
+        return Response({'response': {'method_urls': serializer.data}}, status=status.HTTP_200_OK)
+
+    elif request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = MethodSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'response': {'method_urls': serializer.data}}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

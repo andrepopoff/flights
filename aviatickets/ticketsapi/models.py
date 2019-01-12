@@ -1,3 +1,5 @@
 from django.db import models
 
-# Create your models here.
+
+class Method(models.Model):
+    url = models.URLField()
