@@ -16,7 +16,6 @@ def get_flights(xml_file_path):
     :param xml_file_path: path where the XML file is located
     :return: dictionary with flights data
     """
-    # xml_data = get_xml_data(xml_file_path)
     return from_xml_to_dict(xml_file_path)
 
 
